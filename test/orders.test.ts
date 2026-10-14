@@ -34,6 +34,29 @@ test('orders DAL: getById returns the order', () => {
     type: 'sale',
     status: 'completed',
   });
-  const got = ordersDal.getById('o2');
+  const got = ordersDal.getById('o2', 'm_test');
   assert.equal(got?.total_amount, 1200);
 });
+
+test('orders DAL: prevents cross-merchant access', () => {
+  initSchema();
+
+  db.prepare(`
+    INSERT OR IGNORE INTO merchants (id, name)
+    VALUES ('m_other', 'Other Merchant')
+  `).run();
+
+  ordersDal.create({
+    id: 'o3',
+    merchant_id: 'm_test',
+    customer_email: 'customer@example.com',
+    total_amount: 2500,
+    type: 'sale',
+    status: 'completed',
+  });
+
+  const order = ordersDal.getById('o3', 'm_other');
+
+  assert.equal(order, undefined);
+});
+
