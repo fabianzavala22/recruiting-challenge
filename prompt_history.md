@@ -109,6 +109,38 @@ The model guided me through creating automated HTTP tests to verify the `limit` 
 **What I accepted, rejected, or refined:**
 I accepted the suggested approach for creating automated HTTP tests to validate both valid and invalid `limit` values, as well as the default behavior when the parameter is omitted. I also applied the correction to initialize the SQLite schema after the initial test failed due to missing database tables. The explanations comparing Node.js testing with mobile development helped me better understand the implementation. The model suggested allowing a `limit=0` parameter, but I rejected this because, as a real user, when we perform a query, we expect one or more results. Finally, I ran `npm test` and `npm run build`, and all 12 tests passed successfully without compilation errors.
 
+### Session 7 — Issue 3: Investigation and Problem Reproduction
+
+**Prompt:**
+>Now let’s look at problem 3; let’s examine it and try to reproduce the error with some tests to confirm that it is, in fact, an error.
+
+**What the model returned:**
+The model identified an architectural issue in `metrics.ts`, where SQL queries were executed directly using a separate SQLite connection instead of the shared connection from `db.ts`. It explained how this could cause problems with in-memory databases and suggested running the application with `DB_PATH=:memory:` to reproduce the issue. The test confirmed the problem when the application failed with the error `In-memory/temporary databases cannot be readonly`. The model also recommended creating an automated test to reproduce the failure before implementing the fix.
+
+**What I accepted, rejected, or refined:**
+I accepted the model's recommendations to investigate the separate SQLite connection and reproduce the issue using `DB_PATH=:memory:`. I also followed its suggestion to create an automated test before implementing the fix. I did not reject or modify any recommendations during this stage.
+
+### Session 8 — Issue 3: Database Access Refactoring
+
+**Prompt:**
+>Based on our analysis of the problem, I have determined that the solution is for `metrics` to use the same database connection as `db.ts`. We also need to ensure a proper separation of responsibilities within the architecture. How would you suggest implementing this change to ensure those responsibilities are clearly separated?
+
+**What the model returned:**
+The model suggested creating a new `metrics-dal.ts` file to centralize the SQL queries and reuse the shared SQLite connection from `db.ts`. It also recommended refactoring `metrics.ts` to remove the separate database connection and delegate data access to the DAL, while keeping HTTP request and response handling in the routes. This approach improved the separation of concerns without changing the existing API behavior.
+
+**What I accepted, rejected, or refined:**
+I accepted the model's suggestion to create `metrics-dal.ts` and reuse the shared SQLite connection from `db.ts`. I also followed its recommendation to simplify `metrics.ts` by separating HTTP handling from data access. I did not reject or modify the proposed solution.
+
+### Session 9 — Issue 3: Automated Testing and Verification
+
+**Prompt:**
+>To finish this issue, we need to create tests to check the solution. I suggest adding automated tests to make sure the metrics still work correctly and the previous error is fixed. I would like your help to understand how to write these tests.
+
+**What the model returned:**
+The model helped me create automated tests for the metrics endpoints. It suggested testing `/summary` to verify that the shared database connection works correctly and `/top-customers` to check that customers are filtered by merchant and sorted by total spending. It also recommended an additional test to verify that the default limit of 5 customers was maintained. Finally, the model guided me through running the tests and checking that the project compiled successfully. All 15 tests passed.
+
+**What I accepted, rejected, or refined:**
+I accepted the model's suggestions to create automated tests for both metrics endpoints. I also followed its recommendation to add tests for merchant filtering and the default limit of 5 customers. I did not reject any suggestions, and after running the tests, all 15 passed successfully.
 
 ---
 
