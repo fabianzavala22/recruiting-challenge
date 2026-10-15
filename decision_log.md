@@ -24,13 +24,13 @@
   - **I disagreed with Claude on:** (name where you pushed back during this fix — the rejected suggestion, the alternative shape, the over-scoped refactor — or write *"did not disagree"* and be ready to defend that in the interview) The AI ​​suggested running two tests to verify the solution: one using `npm test` and another using `curl`. I initially skipped the second test, thinking it was unnecessary, but I eventually ran it after realizing that `npm test` validates that the DAL method correctly applies the merchant filter, while `curl` validates that the HTTP endpoint utilizes that restriction and returns the expected response.
   - Alternatives I considered and rejected: I Consider implementing the solution directly within the `orders.ts` logic: after retrieving the order, validate whether it belongs to the merchant and return a 404 if it does not. I rejected this approach because the DAL would still allow orders to be retrieved without merchant-based restrictions, and other endpoints might fail to implement the same check.
 
-- **Issue 2 — <short title>**
-  - What was wrong or weak:
-  - Shape of my improvement:
-  - **Confidence (1–10):**
-  - **What would falsify this fix:**
-  - **I disagreed with Claude on:**
-  - Alternatives I considered and rejected:
+- **Issue 2 — Missing validation for the limit parameter**
+  - What was wrong or weak: The GET /api/orders endpoint accepted a `limit` parameter and converted it directly into a number, but it failed to validate whether the input value was a positive number; this allowed for the processing of negative or non-numeric values, which resulted in incorrect behavior in the response.
+  - Shape of my improvement: Added validations for the `limit` parameter in the endpoint: the value must now be a positive integer between 1 and 100. If the client sends an invalid value, the API nows returns a `400 Bad Request` response instead of passing the invalid limit value to SQLite. Additionally, added HTTP tests to verify both valid and invalid values.
+  - **Confidence (1–10):** 9
+  - **What would falsify this fix:** If the endpoint receives a value that we consider invalid for example, `limit=-10` or `limit=abc`and returns a 200 or 500 status code instead of the 400 Bad Request that we configured, it would mean that the validation is not working. Furthermore, if a request with `limit=10` returns more than 10 orders, the API would not be respecting the requested limit.
+  - **I disagreed with Claude on:** The AI suggested that if `limit=0` were sent, it should be processed as it currently is returning a valid, empty response but from the perspective of an actual user, I believe that when we perform a search, it is because we want one or more results.
+  - Alternatives I considered and rejected: I considered implementing validation for the limit parameter directly in the DAL (orders-dal.ts), but after further analysis, I decided to perform the validation at the HTTP layer (orders.ts) before calling the DAL. For the purposes of this challenge, I believe an HTTP-layer solution is sufficient, because that is where parameters sent by the client are interpreted and validated, and where appropriate status codes (such as 400 Bad Request) are returned.
 
 - **Issue 3 — <short title>**
   - What was wrong or weak:

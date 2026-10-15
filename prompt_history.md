@@ -64,7 +64,8 @@ I accepted the AI's explanation regarding the project's architecture and its com
 ### Session 3 — Issue 1: Merchant Data Isolation, Validation and Documentation
 
 **Prompt:**
->I was able to successfully reproduce the issue you found; it is indeed possible to retrieve information about an order from any business simply by knowing its ID.>To resolve this, we need to add an extra validation step to ensure that the business requesting the order is the one that actually owns it, rather than relying   >solely on the order ID. Please identify all classes that involve this method so that the necessary fix can be implemented.
+>I was able to successfully reproduce the issue you found; it is indeed possible to retrieve information about an order from any business simply by knowing its ID.
+>To resolve this, we need to add an extra validation step to ensure that the business requesting the order is the one that actually owns it, rather than relying solely on the order ID. Please identify all classes that involve this method so that the necessary fix can be implemented.
 
 **What the model returned:**
 The AI identified the files and methods involved in the merchant isolation issue. In `src/dal/orders-dal.ts`, it recommended updating the `getById()` method to accept an additional `merchantId` parameter and modifying the SQL query to filter orders using both `id` and `merchant_id`.
@@ -73,6 +74,41 @@ It also identified the necessary changes in `src/routes/orders.ts`, where the `G
 
 **What I accepted, rejected, or refined:**
 I accepted the AI's recommendation to update the `getById()` method and apply the merchant restriction directly in the SQL query. After implementing the changes, I ran automated tests using `npm test` and performed manual HTTP requests using `curl` to verify that merchants could access their own orders but could not retrieve orders belonging to other merchants.
+
+### Session 4 — Issue 2: Investigation and Problem Reproduction
+
+**Prompt:**
+>Now we are going to look at issue 2, which you identified during the initial analysis; let’s examine it and try to reproduce the error to confirm that it is, in fact, an error.
+
+**What the model returned:**
+The AI analyzed how the `limit` parameter was handled in the `GET /api/orders` endpoint and identified that its value was converted using `Number()` without proper validation. It suggested reproducing the issue with `curl` requests using invalid values such as `abc`, `-10`, and `0`. The tests confirmed that non-numeric input caused a `500 Internal Server Error`, while negative values returned more orders than expected. The model explained how SQLite handles these values and recommended validating the parameter before executing the database query.
+
+**What I accepted, rejected, or refined:**
+I accepted the suggestion to investigate how the `limit` parameter was processed and to reproduce the issue using `curl` requests. I tested different values, including `abc`, `-10`, and `0`, and confirmed that the endpoint returned unexpected responses. These tests helped me verify that the missing input validation was a real issue before making any code changes.
+
+### Session 5 — Issue 2: Input Validation Implementation
+
+**Prompt:**
+>After analyzing the situation, I have determined that the solution is to add validations for the `limit` parameter so that it does not accept negative or non-numeric values only positive integers. 
+>I plan to modify that part of the endpoint; could you provide some guidance on the best logic to ensure all possible scenarios are covered?
+
+**What the model returned:**
+The AI suggested implementing input validation for the limit parameter directly in the HTTP route. It explained how to check whether the parameter is a string containing only digits, convert it into a number, and verify that it is a safe integer between 1 and 100. It also recommended returning 400 Bad Request for invalid values and using a default limit of 100 when the parameter is not provided. Additionally, the model explained the purpose of DEFAULT_LIMIT, MAX_LIMIT, and the let limit variable, comparing their behavior to Native Mobile Development concepts.
+
+**What I accepted, rejected, or refined:**
+I accepted the proposed validation logic for the `limit` parameter, including checking that the input contains only digits and that its numeric value is a safe integer between 1 and 100. I also accepted returning `400 Bad Request` for invalid values and keeping 100 as the default limit. Before implementing the solution, I asked for clarification about the purpose of `DEFAULT_LIMIT`, `MAX_LIMIT`, and the `let limit` variable to better understand the proposed approach.
+
+### Session 6 — Issue 2: Input Validation Implementation
+
+**Prompt:**
+>Now we need to create tests to validate that the modified code fixes the bug. Please guide me through the logic for these tests, and as we write them, show me what the equivalent would look like in mobile development so I can better understand the code.
+
+**What the model returned:**
+The model guided me through creating automated HTTP tests to verify the `limit` parameter validation, including invalid inputs, valid values, and the default limit of 100. It explained how to use Node.js testing tools, Express, and `fetch()` to simulate HTTP requests. When the initial test failed because the SQLite schema had not been initialized, the model helped identify the problem and suggested adding `initSchema()`. It also explained the testing approach using comparisons with mobile development concepts, helping me understand the differences between testing an HTTP endpoint and testing Kotlin application components. Finally, it recommended running `npm test` and `npm run build` to verify the implementation.
+
+**What I accepted, rejected, or refined:**
+I accepted the suggested approach for creating automated HTTP tests to validate both valid and invalid `limit` values, as well as the default behavior when the parameter is omitted. I also applied the correction to initialize the SQLite schema after the initial test failed due to missing database tables. The explanations comparing Node.js testing with mobile development helped me better understand the implementation. The model suggested allowing a `limit=0` parameter, but I rejected this because, as a real user, when we perform a query, we expect one or more results. Finally, I ran `npm test` and `npm run build`, and all 12 tests passed successfully without compilation errors.
+
 
 ---
 
