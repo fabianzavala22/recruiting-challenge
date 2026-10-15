@@ -98,7 +98,7 @@ The AI suggested implementing input validation for the limit parameter directly 
 **What I accepted, rejected, or refined:**
 I accepted the proposed validation logic for the `limit` parameter, including checking that the input contains only digits and that its numeric value is a safe integer between 1 and 100. I also accepted returning `400 Bad Request` for invalid values and keeping 100 as the default limit. Before implementing the solution, I asked for clarification about the purpose of `DEFAULT_LIMIT`, `MAX_LIMIT`, and the `let limit` variable to better understand the proposed approach.
 
-### Session 6 — Issue 2: Input Validation Implementation
+### Session 6 — Issue 2: Automated Testing and Validation
 
 **Prompt:**
 >Now we need to create tests to validate that the modified code fixes the bug. Please guide me through the logic for these tests, and as we write them, show me what the equivalent would look like in mobile development so I can better understand the code.
