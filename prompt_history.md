@@ -30,10 +30,11 @@ For each session, paste the raw transcript or the prompts you sent, in order. Do
 ### Session 1 — Initial challenge analysis
 
 **Prompt:**
-```
-Hello, I am about to take a technical assessment for a Senior Mobile Engineer position at T1. The test they sent me can be found in this repository: https://github.com/PlataformaT1/recruiting-challenge. Based on my own analysis, it doesn't seem to resemble a typical mobile development assessment. Could you analyze it and provide a detailed summary of its objectives, the technologies used, the architecture, etc.? Also, please suggest how I might approach this—given my background in mobile development—to effectively demonstrate my skills as a Senior Engineer.
-
-```
+>Hello, I am about to take a technical assessment for a Senior Mobile Engineer position at T1. 
+>The test they sent me can be found in this repository: https://github.com/PlataformaT1/recruiting-challenge. 
+>Based on my own analysis, it doesn't seem to resemble a typical mobile development assessment. 
+>Could you analyze it and provide a detailed summary of its objectives, the technologies used, the architecture, etc.? 
+>Also, please suggest how I might approach this—given my background in mobile development—to effectively demonstrate my skills as a Senior Engineer.
 
 **What the model returned:**
 The AI ​​analyzed the T1 selection test and outlined its key requirements, which include identifying and fixing at least three code quality issues, implementing new functionality, adding tests, and completing the required documentation. It also identified the core technologies used in the project—TypeScript, Node.js, and SQLite—and explained how this test differs from a typical mobile development assessment. Furthermore, it provided guidance on how to effectively demonstrate the skills of a senior engineer during this test, even though it is not a mobile-focused assignment.
@@ -46,10 +47,9 @@ I accepted the initial analysis of the challenge provided by the AI, which helpe
 ### Session 2 — Environment Setup and Codebase Exploration
 
 **Prompt:**
-```
-I use macOS, and I’ve already set up my environment for this project: installing VS Code, Node.js, npm, and so on. I’ve also successfully run the app locally at localhost:3000, as instructed in the repository, and verified that the tests pass. We’ll analyze the project’s code and briefly compare it with mobile technologies to make it easier to grasp; then, we’ll identify three issues that we can address.
-
-```
+>I use macOS, and I’ve already set up my environment for this project: installing VS Code, Node.js, npm, and so on. 
+>I have also successfully run the app locally at localhost:3000, as instructed in the repository, and verified that the tests pass. 
+>We’ll analyze the project’s code and briefly compare it with mobile technologies to make it easier to grasp; then, we’ll identify three issues that we can address.
 
 **What the model returned:**
 The AI analyzed the existing codebase and explained the project's architecture, main components, and order management functionality. It described how the TypeScript, Express, and SQLite layers interact, comparing their responsibilities with familiar Mobile development concepts such as API endpoints, repositories, and data access layers.
@@ -64,10 +64,7 @@ I accepted the AI's explanation regarding the project's architecture and its com
 ### Session 3 — Issue 1: Merchant Data Isolation, Validation and Documentation
 
 **Prompt:**
-```
-I was able to successfully reproduce the issue you found; it is indeed possible to retrieve information about an order from any business simply by knowing its ID. To resolve this, we need to add an extra validation step to ensure that the business requesting the order is the one that actually owns it, rather than relying solely on the order ID. Please identify all classes that involve this method so that the necessary fix can be implemented.
-
-```
+>I was able to successfully reproduce the issue you found; it is indeed possible to retrieve information about an order from any business simply by knowing its ID.>To resolve this, we need to add an extra validation step to ensure that the business requesting the order is the one that actually owns it, rather than relying   >solely on the order ID. Please identify all classes that involve this method so that the necessary fix can be implemented.
 
 **What the model returned:**
 The AI identified the files and methods involved in the merchant isolation issue. In `src/dal/orders-dal.ts`, it recommended updating the `getById()` method to accept an additional `merchantId` parameter and modifying the SQL query to filter orders using both `id` and `merchant_id`.

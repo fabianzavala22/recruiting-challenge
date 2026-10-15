@@ -9,7 +9,6 @@
 > Replace this block with one of the two statements below, in your own words if you prefer:
 >
 > - *"I wrote this decision log entirely without AI assistance. The only tool I used on it was spell-check."*
-> - *"I used AI on this decision log for the following limited purposes: <list each use>. Everything else is mine."*
 
 ---
 
