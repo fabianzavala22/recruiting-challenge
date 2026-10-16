@@ -228,24 +228,24 @@ Finally, I manually tested the feature with different merchants and date ranges,
 
 ### Example 1
 
-- **The prompt:**
-- **What Claude returned:**
-- **What was wrong with it** (technically, not just stylistically):
-- **How I caught it** (what tipped you off — code reading, test failure, behavior in the browser, prior experience):
-- **What I did instead** (and where to see it in the diff, if applicable):
+- **The prompt:** Now we need to create tests to validate that the modified code fixes the bug. Please guide me through the logic for these tests, and as we write them, show me what the equivalent would look like in mobile development so I can better understand the code.
+- **What the model returned:** The model provided an HTTP test for the orders endpoint, but the proposed implementation did not include a call to `initSchema()` before running the test.
+- **What was wrong with it:** The test database schema was not initialized, so the required `orders` table did not exist when the test attempted to query it.
+- **How I caught it:** I discovered the issue when I ran the test and received the error `SqliteError: no such table: orders`.
+- **What I did instead:** I corrected the test setup by adding `initSchema()` before executing the HTTP requests. After making this change, I ran the tests again to verify that the database was properly initialized.
 
 ### Example 2
 
-- **The prompt:**
-- **What Claude returned:**
-- **What was wrong with it:**
-- **How I caught it:**
-- **What I did instead:**
+- **The prompt:** Now let’s look at problem 3; let’s examine it and try to reproduce the error with some tests to confirm that it is, in fact, an error.
+- **What the model returned:** The model suggested testing the metrics functionality using `DB_PATH=:memory:`, but it did not account for the fact that `metrics.ts` was opening a separate SQLite connection in read-only mode.
+- **What was wrong with it:** The suggested testing approach was incompatible with the existing database configuration because SQLite does not support opening an in-memory database in read-only mode.
+- **How I caught it:** I discovered the issue when I ran the application and received the error `TypeError: In-memory/temporary databases cannot be readonly`.
+- **What I did instead:** I refactored the metrics queries into a new `metrics-dal.ts` file and reused the shared database connection from `src/db.ts`. This removed the need for a separate read-only connection and allowed the metrics functionality to work with the in-memory database.
 
 ### Example 3
 
-- **The prompt:**
-- **What Claude returned:**
-- **What was wrong with it:**
-- **How I caught it:**
-- **What I did instead:**
+- **The prompt:** I previously asked for your suggestions on what I should include in my documentation to properly explain how I approached the test; you mentioned that we decided to keep the frontend free of any frameworks but I don’t recall us making that decision during the development of the test. Did we?
+- **What the model returned:** The model suggested documenting that I had deliberately kept the existing frontend in vanilla JavaScript and avoided restructuring the application.
+- **What was wrong with it:** The model presented this as a deliberate architectural decision, even though I had never explicitly made or discussed that decision during development. The suggestion was based on an assumption rather than an actual decision.
+- **How I caught it:** I noticed the inconsistency while reviewing the suggested content for `decision_log.md`. I compared it with the decisions I had actually made during the challenge and realized that it did not accurately reflect my development process.
+- **What I did instead:** I rejected that suggestion and documented a decision supported by my implementation: keeping the existing `listByMerchant()` method unchanged and introducing a separate `listForExport()` method because the dashboard listing and CSV export had different requirements.

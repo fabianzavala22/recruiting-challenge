@@ -50,22 +50,22 @@
 
 ## Things I noticed but did NOT fix
 
-> Class-of-bug instances you saw and chose not to touch. For each, name the *reason* you cut it (scope / time / dependency / "needs a larger conversation").
+- I identified that the backend uses the `X-Merchant-Id` header sent by the client to determine which merchant a request belongs to; however, it does not verify whether the user is actually authorized to access that merchant. This poses a security risk, as an individual could manually modify the header to access another merchant's data.
 
--
+I decided not to fix this, as implementing proper authentication and authorization would require more extensive changes to the architecture, middleware, and testing. I concluded that this was out of scope given the time available for this challenge.
 
 ## Docs / code I left alone deliberately
 
--
+- I kept the `listByMerchant()` method unchanged when implementing the new export functionality. Instead, I added `listForExport()` as a separate method, since the dashboard listing and the CSV export have different requirements.
 
 ## What I'd do with another 6 hours
 
--
+- If I had more time for this challenge, I would prioritize improving system security by implementing authentication and authorization to ensure that each user can only access the merchants they are authorized to access.
 
 ## Where I felt uncertain
 
 > At least three places in this submission where you were not confident. Genuine uncertainty is a strength signal. "Nothing — I was confident everywhere" is itself a red flag and will be probed.
 
--
--
--
+- I was not sure whether filtering orders by merchant would be sufficient to protect the data, since the merchant identifier is still provided by the client.
+- I was unsure whether setting a limit of 10,000 orders was the best decision for CSV Export, given that a streaming-based implementation could handle larger volumes.
+- I was not entirely sure whether the implemented tests covered all important cases, especially those related to CSV formatting and less common scenarios.
