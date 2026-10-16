@@ -1,8 +1,58 @@
 import { Router } from 'express';
 import { ordersDal } from '../dal/orders-dal.js';
 import { randomUUID } from 'node:crypto';
+import { generateOrdersCsv } from '../utils/orders-csv.js';
 
 export const ordersRouter = Router();
+
+const MAX_EXPORT_ROWS = 10000;
+
+ordersRouter.get('/export', (req, res) => {
+  const { from, to } = req.query;
+
+  // Both dates are required
+  if (
+    typeof from !== 'string' ||
+    typeof to !== 'string' ||
+    !isValidDate(from) ||
+    !isValidDate(to) ||
+    from > to
+  ) {
+    res.status(400).json({ error: 'invalid_date_range' });
+    return;
+  }
+
+  // Include the entire final day
+  const fromDate = `${from} 00:00:00`;
+
+  const nextDay = new Date(`${to}T00:00:00.000Z`);
+  nextDay.setUTCDate(nextDay.getUTCDate() + 1);
+
+  const toExclusive = nextDay.toISOString().slice(0, 10) + ' 00:00:00';
+
+  // Request one extra row to detect oversized exports
+  const orders = ordersDal.listForExport(
+    req.merchantId!,
+    fromDate,
+    toExclusive,
+    MAX_EXPORT_ROWS + 1
+  );
+
+  if (orders.length > MAX_EXPORT_ROWS) {
+    res.status(413).json({ error: 'export_limit_exceeded' });
+    return;
+  }
+
+  const csv = generateOrdersCsv(orders);
+
+  res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+  res.setHeader(
+    'Content-Disposition',
+    `attachment; filename="orders-${from}-to-${to}.csv"`
+  );
+
+  res.status(200).send(csv);
+});
 
 ordersRouter.get('/', (req, res) => {
   const rawLimit = req.query.limit;
@@ -70,3 +120,16 @@ ordersRouter.post('/', (req, res) => {
   });
   res.status(201).json({ order });
 });
+
+function isValidDate(value: string): boolean {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    return false;
+  }
+
+  const date = new Date(`${value}T00:00:00.000Z`);
+
+  return (
+    !Number.isNaN(date.getTime()) &&
+    date.toISOString().slice(0, 10) === value
+  );
+}
