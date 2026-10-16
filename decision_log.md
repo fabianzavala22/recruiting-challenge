@@ -42,11 +42,11 @@
 
 ## Feature chosen
 
-- **Feature:**
-- **Why this one and not the others:**
-- **What I cut to ship it in budget:**
-- **Confidence (1–10) that the shape I picked is the right one:**
-- **What would change my mind:**
+- **Feature:** CSV export of orders.
+- **Why this one and not the others:** I chose CSV Export over the other options primarily due to the time available, its low complexity, and the ability to leverage the existing DAL.
+- **What I cut to ship it in budget:** Limit exports to 10,000 orders, background processing, or bulk exports.
+- **Confidence (1–10) that the shape I picked is the right one:** 9
+- **What would change my mind:** If I needed to export hundreds of thousands of orders or generate files that are too large to process in memory.
 
 ## Things I noticed but did NOT fix
 

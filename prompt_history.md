@@ -142,6 +142,82 @@ The model helped me create automated tests for the metrics endpoints. It suggest
 **What I accepted, rejected, or refined:**
 I accepted the model's suggestions to create automated tests for both metrics endpoints. I also followed its recommendation to add tests for merchant filtering and the default limit of 5 customers. I did not reject any suggestions, and after running the tests, all 15 passed successfully.
 
+### Session 10 — CSV Export — Requirements Analysis and Design
+
+**Prompt:**
+>Now, for the final part of this test, I need to add a new feature to the project. There are three options, which are described in the README file. I would personally like to implement an export-to-CSV feature for orders, as I believe this is a task frequently performed by businesses for their reporting in real-world systems. However, let’s analyze each option to gauge its complexity and decide which one to implement, based on the time remaining before the test submission deadline.
+
+**What the model returned:**
+The model analyzed the three available features: CSV Export, Webhooks, and Advanced Search, comparing their implementation complexity, required changes, and estimated development effort.
+
+It identified CSV Export as the lowest-complexity option because it could reuse the existing orders data access layer and required relatively limited backend and frontend changes. Advanced Search would require additional filtering logic and UI changes, while Webhooks would introduce more complex concerns such as event delivery, retries, and failure handling.
+
+Based on this comparison, the model recommended implementing CSV Export as the most practical option within the challenge's time constraints, allowing enough time for automated testing, validation, and documentation.
+
+**What I accepted, rejected, or refined:**
+I accepted the model's recommendation to implement CSV Export because it was the most feasible option within the challenge's time constraints. I prioritized delivering a complete, tested feature over choosing a more complex implementation such as Webhooks or Advanced Search. I did not make significant changes to the initial feature selection recommendation.
+
+### Session 11 — CSV Export — Backend Implementation
+
+**Prompt:**
+>We have decided to implement the export of orders to CSV; we are proceeding step by step, adding the necessary functions and the new endpoint, while reusing components that are already implemented and ready for this export process.
+
+**What the model returned:**
+The model provided a step-by-step implementation plan for the CSV Export backend, following the project's existing architecture.
+
+It suggested adding a new method, `listForExport()`, to the orders DAL to retrieve merchant-specific orders within a date range, and creating an `orders-csv.ts` utility to generate CSV content with proper escaping of special characters and basic protection against spreadsheet formula injection.
+
+The model also guided the implementation of the `GET /api/orders/export` endpoint, including date validation, merchant filtering, CSV response headers, and a maximum export limit of 10,000 orders to prevent excessively large exports. It recommended placing the export route before the dynamic `/:id` route to avoid routing conflicts.
+
+The implementation was completed incrementally, with compilation and automated tests used to verify the changes.
+
+**What I accepted, rejected, or refined:**
+I accepted the model's proposed approach and implemented the CSV Export backend incrementally, following the existing project architecture. I added the `listForExport()` method to the orders DAL, created a separate utility for CSV generation, and implemented the export endpoint with date validation and merchant filtering.
+
+I also adopted the recommended 10,000-order limit, CSV escaping, and basic protection against spreadsheet formula injection. I verified each implementation step through compilation and automated tests. I did not make significant changes to the proposed backend design.
+
+### Session 12 — CSV Export — Automated Testing and Validation
+
+**Prompt:**
+>Now that we have the necessary code implementation in place, we will perform tests before adding visual components to the screen to verify that our code is correct and functions as expected.
+
+**What the model returned:**
+The model recommended expanding the automated test coverage for CSV Export to validate both successful exports and error scenarios.
+
+It guided the implementation of tests to verify that exported orders belonged to the selected merchant and fell within the requested date range. It also suggested testing invalid or missing dates, reversed date ranges, proper escaping of special CSV characters, and basic protection against spreadsheet formula injection.
+
+Additionally, the model recommended testing the maximum export limit by inserting 10,001 orders into SQLite within a transaction and verifying that the endpoint returned HTTP 413 with the `export_limit_exceeded` error.
+
+The model explained the purpose of each test and recommended running the test suite and TypeScript compilation after each implementation step. All 20 automated tests and the build completed successfully.
+
+**What I accepted, rejected, or refined:**
+I accepted the model's recommendations to expand the automated test coverage for CSV Export, including merchant isolation, date range validation, CSV escaping, and basic protection against spreadsheet formula injection.
+
+I also implemented the suggested test for the 10,000-order export limit, using a SQLite transaction to insert 10,001 orders efficiently. I followed the incremental testing approach and verified that all 20 automated tests passed and the project compiled successfully.
+
+I did not make significant changes to the proposed testing approach.
+
+### Session 13 — CSV Export — Dashboard Integration and Manual Testing
+
+**Prompt:**
+>Okay, since we have confirmed during testing that it works correctly, the final step is to add the visual components such as the date fields and the button and verify that it actually downloads the CSV file with the requested data.
+
+**What the model returned:**
+The model provided step-by-step guidance for integrating the CSV Export feature into the existing dashboard.
+
+It recommended adding two date inputs and a Download CSV button to `index.html`, along with basic CSS styling. For `app.js`, the model suggested initializing a default 30-day date range and implementing a download function using `fetch()`, `Blob`, and `URL.createObjectURL()` to generate a downloadable file in the browser.
+
+The model also recommended including the selected merchant's ID in the request headers, validating the date range before submitting the request, and displaying appropriate success or error messages.
+
+Finally, it provided a manual testing checklist to verify successful downloads, merchant data isolation, invalid date handling, and exports with no matching orders. The dashboard integration and manual tests were completed successfully.
+
+**What I accepted, rejected, or refined:**
+I accepted the model's recommendations for integrating CSV Export into the existing dashboard. I added the date inputs, the Download CSV button, and the required styling.
+
+I also implemented the suggested download logic using `fetch()`, `Blob`, and `URL.createObjectURL()`, including merchant identification, date range validation, and success and error messages.
+
+Finally, I manually tested the feature with different merchants and date ranges, confirming that the CSV files contained the expected data and that invalid date ranges were handled correctly. I did not make significant changes to the proposed frontend implementation.
+
 ---
 
 ## What Claude (or your AI tool) got wrong
